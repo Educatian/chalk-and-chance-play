@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chalk & Chance | Web Playable Showcase</title>
+  <meta name="description" content="Chalk & Chance Godot Web build, screenshots, walkthrough reel, and beginner QA revision notes." />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1020;
+      --panel: #12192e;
+      --panel-2: #18223c;
+      --ink: #f5f1dc;
+      --muted: #a9b7d6;
+      --line: #2b3558;
+      --green: #62c36f;
+      --gold: #f1bc46;
+      --red: #e05a5f;
+      --blue: #72a7ff;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+    a { color: var(--blue); text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    .pixel { image-rendering: pixelated; image-rendering: crisp-edges; }
+    .wrap { width: min(1160px, calc(100% - 36px)); margin: 0 auto; }
+    .top {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid var(--line);
+      background: rgba(11, 16, 32, 0.92);
+      backdrop-filter: blur(10px);
+    }
+    .top .wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 58px;
+      gap: 18px;
+    }
+    .brand {
+      font-weight: 900;
+      letter-spacing: 0.02em;
+    }
+    .brand span { color: var(--green); }
+    nav { display: flex; gap: 18px; flex-wrap: wrap; justify-content: flex-end; }
+    nav a { color: var(--muted); font-size: 14px; }
+    nav a:hover { color: var(--ink); }
+    .hero {
+      min-height: 82vh;
+      display: grid;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(rgba(11, 16, 32, 0.18), rgba(11, 16, 32, 0.88)),
+        url("media/overworld.png") center / cover no-repeat;
+    }
+    .hero h1 {
+      max-width: 900px;
+      margin: 0 0 18px;
+      font-size: clamp(40px, 8vw, 92px);
+      line-height: 0.95;
+      letter-spacing: 0;
+      text-shadow: 0 5px 0 rgba(0, 0, 0, 0.42);
+    }
+    .hero p {
+      max-width: 720px;
+      margin: 0 0 28px;
+      color: #d6def4;
+      font-size: clamp(17px, 2vw, 22px);
+    }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 18px;
+      border: 1px solid #000;
+      border-radius: 8px;
+      background: var(--panel-2);
+      color: var(--ink);
+      font-weight: 800;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.6);
+    }
+    .btn.primary {
+      background: var(--green);
+      color: #05150a;
+    }
+    section {
+      padding: 64px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .kicker {
+      margin: 0 0 8px;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    h2 {
+      margin: 0 0 12px;
+      font-size: clamp(25px, 4vw, 42px);
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+    .section-copy {
+      max-width: 820px;
+      margin: 0 0 28px;
+      color: var(--muted);
+      font-size: 17px;
+    }
+    .play-frame {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #050812;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.38);
+    }
+    .play-frame iframe {
+      display: block;
+      width: 100%;
+      height: min(72vh, 680px);
+      min-height: 520px;
+      border: 0;
+      background: #000;
+    }
+    .note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      overflow: hidden;
+    }
+    .card img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      background: #050812;
+    }
+    .card div { padding: 14px; }
+    .card h3 {
+      margin: 0 0 6px;
+      font-size: 16px;
+    }
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .reel {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      aspect-ratio: 16 / 9;
+      background: #050812;
+    }
+    .video-frame {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #050812;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.28);
+    }
+    .video-frame video {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+    }
+    .fallback-reel-title {
+      margin: 26px 0 10px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .reel img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      animation: reel 24s infinite;
+    }
+    .reel img:nth-child(1) { animation-delay: 0s; }
+    .reel img:nth-child(2) { animation-delay: 4s; }
+    .reel img:nth-child(3) { animation-delay: 8s; }
+    .reel img:nth-child(4) { animation-delay: 12s; }
+    .reel img:nth-child(5) { animation-delay: 16s; }
+    .reel img:nth-child(6) { animation-delay: 20s; }
+    @keyframes reel {
+      0% { opacity: 0; transform: scale(1.02); }
+      5% { opacity: 1; transform: scale(1); }
+      16% { opacity: 1; transform: scale(1); }
+      21% { opacity: 0; transform: scale(0.995); }
+      100% { opacity: 0; }
+    }
+    .reel-label {
+      position: absolute;
+      left: 16px;
+      bottom: 16px;
+      z-index: 3;
+      max-width: min(520px, calc(100% - 32px));
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 8px;
+      background: rgba(5, 8, 18, 0.78);
+      color: var(--ink);
+      font-weight: 800;
+    }
+    .checks {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .check {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 14px 16px;
+      color: var(--muted);
+    }
+    .check b { color: var(--ink); }
+    .pass { color: var(--green); font-weight: 900; }
+    .guide-list {
+      display: grid;
+      gap: 16px;
+    }
+    .guide-step {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 18px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+    .step-number {
+      color: var(--green);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 13px;
+    }
+    .guide-step h3 {
+      margin: 0 0 12px;
+      font-size: 20px;
+    }
+    .guide-cols {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .guide-note {
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .guide-note b {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--gold);
+      font-size: 13px;
+    }
+    .guide-note p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .files {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    footer {
+      padding: 32px 0 48px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    @media (max-width: 860px) {
+      .top .wrap { align-items: flex-start; flex-direction: column; padding: 14px 0; }
+      nav { justify-content: flex-start; }
+      .hero { min-height: 74vh; }
+      .grid, .checks, .guide-cols { grid-template-columns: 1fr; }
+      .guide-step { grid-template-columns: 1fr; }
+      .play-frame iframe { min-height: 420px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .reel img { animation: none; }
+      .reel img:first-child { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <div class="brand">CHALK <span>&</span> CHANCE</div>
+      <nav aria-label="Page navigation">
+        <a href="#play">Playable</a>
+        <a href="#reel">Walkthrough</a>
+        <a href="#guide">Player Guide</a>
+        <a href="#screens">Screenshots</a>
+        <a href="#qa">QA fixes</a>
+        <a href="#package">Files</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <p class="kicker">Godot Web Build + Media Package</p>
+        <h1>Chalk & Chance</h1>
+        <p>A web-playable package revised around first-time player clarity: UI, interaction feedback, accessibility, import preview, and reflection flow.</p>
+        <div class="actions">
+          <a class="btn primary" href="#play">Play web build</a>
+          <a class="btn" href="#screens">View screenshots</a>
+          <a class="btn" href="#qa">Read QA changes</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="play">
+      <div class="wrap">
+        <p class="kicker">Playable HTML</p>
+        <h2>A Godot export that runs directly in the browser</h2>
+        <p class="section-copy">The iframe below embeds the <code>index.html</code> web build from this same folder. When hosting, upload the entire <code>dist_web</code> folder so the playable build and showcase work together.</p>
+        <div class="play-frame">
+          <iframe src="index.html" title="Chalk & Chance playable Godot web build" allow="autoplay; fullscreen; gamepad"></iframe>
+        </div>
+        <p class="note">Serve this folder over HTTP instead of opening it as a local file so the WebAssembly files load reliably.</p>
+      </div>
+    </section>
+
+    <section id="reel">
+      <div class="wrap">
+        <p class="kicker">Player guide video</p>
+        <h2>Screen recording with subtitles</h2>
+        <p class="section-copy">This walkthrough explains how to start the game, what the main buttons do, and how to interpret each activity as teaching practice. English subtitles are embedded in the video and also provided as a WebVTT file.</p>
+        <div class="video-frame">
+          <video controls preload="metadata" poster="media/overworld.png">
+            <source src="videos/chalk-and-chance-showcase.webm" type="video/webm" />
+            <track label="English" kind="subtitles" srclang="en" src="videos/chalk-and-chance-showcase-subtitles.vtt" default />
+          </video>
+        </div>
+        <p class="fallback-reel-title">Fallback screenshot reel</p>
+        <div class="reel" role="img" aria-label="Animated walkthrough reel of Chalk and Chance screenshots">
+          <img class="pixel" src="media/login.png" alt="Login screen" />
+          <img class="pixel" src="media/hub.png" alt="Mission hub" />
+          <img class="pixel" src="media/lecture.png" alt="Lecture scene" />
+          <img class="pixel" src="media/overworld.png" alt="Overworld classroom" />
+          <img class="pixel" src="media/encounter.png" alt="Student encounter" />
+          <img class="pixel" src="media/debrief.png" alt="Debrief screen" />
+          <div class="reel-label">Login -> Hub -> Lecture -> Overworld -> Encounter -> Debrief</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="screens">
+      <div class="wrap">
+        <p class="kicker">Screenshots</p>
+        <h2>Key screen captures</h2>
+        <p class="section-copy">These captures show the main player-facing flows that were reviewed and improved during the beginner QA pass.</p>
+        <div class="grid">
+          <article class="card">
+            <img class="pixel" src="media/login.png" alt="Login and demo start screen" />
+            <div><h3>Login</h3><p>Demo-first entry with no account required.</p></div>
+          </article>
+          <article class="card">
+            <img class="pixel" src="media/hub.png" alt="Mission hub with badge progression" />
+            <div><h3>Mission Hub</h3><p>START HERE, badge legend, settings entry.</p></div>
+          </article>
+          <article class="card">
+            <img class="pixel" src="media/lecture.png" alt="Lecture teaching mode" />
+            <div><h3>Lecture</h3><p>Question target, wait readiness, action feedback.</p></div>
+          </article>
+          <article class="card">
+            <img class="pixel" src="media/overworld.png" alt="Classroom overworld objective hints" />
+            <div><h3>Overworld</h3><p>Objective checklist and Z/Enter interaction hint.</p></div>
+          </article>
+          <article class="card">
+            <img class="pixel" src="media/encounter.png" alt="Student encounter with move help" />
+            <div><h3>Encounter</h3><p>Move preview, result chips, continue button.</p></div>
+          </article>
+          <article class="card">
+            <img class="pixel" src="media/freetext.png" alt="Free text interaction" />
+            <div><h3>Free Text</h3><p>Offline free-text classification and telemetry clarity.</p></div>
+          </article>
+          <article class="card">
+            <img class="pixel" src="media/gym.png" alt="Gym capstone" />
+            <div><h3>Gym</h3><p>Current target, student need, result feedback.</p></div>
+          </article>
+          <article class="card">
+            <img class="pixel" src="media/competency.png" alt="Competency panel" />
+            <div><h3>Competency</h3><p>Evidence count and next practice focus.</p></div>
+          </article>
+          <article class="card">
+            <img class="pixel" src="media/preview.png" alt="Scenario preview and validation" />
+            <div><h3>Import Preview</h3><p>Scenario card and user-facing validation.</p></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="guide">
+      <div class="wrap">
+        <p class="kicker">Detailed player guide</p>
+        <h2>What to see, study, and notice at each step</h2>
+        <p class="section-copy">This guide makes the walkthrough explicit. Each step explains what the player sees on screen, what teaching concept to study, and what kind of reflection or feeling the activity is meant to support.</p>
+        <div class="guide-list">
+          <article class="guide-step">
+            <div class="step-number">Step 1</div>
+            <div>
+              <h3>Start the rehearsal</h3>
+              <div class="guide-cols">
+                <div class="guide-note"><b>What you see</b><p>A classroom scene, students, and teacher-facing information rather than a conventional menu puzzle.</p></div>
+                <div class="guide-note"><b>What you study</b><p>The room as a practice space. The game asks you to rehearse teaching decisions, not simply complete a level.</p></div>
+                <div class="guide-note"><b>What to notice</b><p>Mistakes are expected data. A confusing moment tells you what to try differently.</p></div>
+              </div>
+            </div>
+          </article>
+          <article class="guide-step">
+            <div class="step-number">Step 2</div>
+            <div>
+              <h3>Choose Play demo</h3>
+              <div class="guide-cols">
+                <div class="guide-note"><b>What you see</b><p>A prominent Play demo button and a class sign-in area.</p></div>
+                <div class="guide-note"><b>What you study</b><p>The demo starts immediately. Sign in / Join is for class accounts that need saved progress and instructor tracking.</p></div>
+                <div class="guide-note"><b>What to notice</b><p>You do not need credentials to learn the basic flow. Start with the demo first.</p></div>
+              </div>
+            </div>
+          </article>
+          <article class="guide-step">
+            <div class="step-number">Step 3</div>
+            <div>
+              <h3>Read the first screen calmly</h3>
+              <div class="guide-cols">
+                <div class="guide-note"><b>What you see</b><p>Class code, name, password, and guest-play options.</p></div>
+                <div class="guide-note"><b>What you study</b><p>Class code, name, and password are only for assigned courses. Guest play is enough for first-time exploration.</p></div>
+                <div class="guide-note"><b>What to notice</b><p>The game is safe to try before you understand every setting.</p></div>
+              </div>
+            </div>
+          </article>
+          <article class="guide-step">
+            <div class="step-number">Step 4</div>
+            <div>
+              <h3>Use the Mission Hub as a learning map</h3>
+              <div class="guide-cols">
+                <div class="guide-note"><b>What you see</b><p>START HERE, mission rows, badges, and locked missions.</p></div>
+                <div class="guide-note"><b>What you study</b><p>Badges are practice goals: Routine is pacing, Echo is reasoning, Balance is airtime, Mirror is feedback, and Insight is capstone judgment.</p></div>
+                <div class="guide-note"><b>What to notice</b><p>Locked missions are not a punishment. They show the sequence of teaching skills the game wants you to build.</p></div>
+              </div>
+            </div>
+          </article>
+          <article class="guide-step">
+            <div class="step-number">Step 5</div>
+            <div>
+              <h3>Notice Settings and Import</h3>
+              <div class="guide-cols">
+                <div class="guide-note"><b>What you see</b><p>Settings and Import a lesson plan.</p></div>
+                <div class="guide-note"><b>What you study</b><p>Settings adjusts comfort: sound, larger text, reduced motion, and dialogue speed. Import turns your own lesson text into a playable scenario.</p></div>
+                <div class="guide-note"><b>What to notice</b><p>The game can become closer to your actual teaching context, not just a fixed example.</p></div>
+              </div>
+            </div>
+          </article>
+          <article class="guide-step">
+            <div class="step-number">Step 6</div>
+            <div>
+              <h3>Read the classroom signals</h3>
+              <div class="guide-cols">
+                <div class="guide-note"><b>What you see</b><p>Students, bars, objective checklist, attention, composure, participation, wait time, and disruptions.</p></div>
+                <div class="guide-note"><b>What you study</b><p>These are live teaching signals. Attention shows whether the room is with you. Composure shows your remaining capacity. Participation shows inclusion.</p></div>
+                <div class="guide-note"><b>What to notice</b><p>You are managing a learning environment, not only choosing dialogue.</p></div>
+              </div>
+            </div>
+          </article>
+          <article class="guide-step">
+            <div class="step-number">Step 7</div>
+            <div>
+              <h3>Enter a student thinking moment</h3>
+              <div class="guide-cols">
+                <div class="guide-note"><b>What you see</b><p>A student nearby and an interaction hint.</p></div>
+                <div class="guide-note"><b>What you study</b><p>Move with arrow keys or WASD. Press Z, Enter, or Space when facing a student.</p></div>
+                <div class="guide-note"><b>What to notice</b><p>Interaction is a teaching decision. You are deciding when to step into a student's thinking, not collecting points.</p></div>
+              </div>
+            </div>
+          </article>
+          <article class="guide-step">
+            <div class="step-number">Step 8</div>
+            <div>
+              <h3>Read the student first</h3>
+              <div class="guide-cols">
+                <div class="guide-note"><b>What you see</b><p>A student response, portrait, meters, and possible teaching moves.</p></div>
+                <div class="guide-note"><b>What you study</b><p>The hidden need behind the response: confusion, dominance, avoidance, anxiety, off-task behavior, or readiness for a deeper prompt.</p></div>
+                <div class="guide-note"><b>What to notice</b><p>Listen before acting. The best move depends on what the student needs, not just which button sounds positive.</p></div>
+              </div>
+            </div>
+          </article>
+          <article class="guide-step">
+            <div class="step-number">Step 9</div>
+            <div>
+              <h3>Use academic teaching moves</h3>
+              <div class="guide-cols">
+                <div class="guide-note"><b>What you see</b><p>Elicit, Extend, Revoice, and Wait.</p></div>
+                <div class="guide-note"><b>What you study</b><p>Elicit asks for reasoning. Extend presses deeper. Revoice clarifies or restates the student's idea. Wait protects thinking time.</p></div>
+                <div class="guide-note"><b>What to notice</b><p>These moves help students do the thinking themselves.</p></div>
+              </div>
+            </div>
+          </article>
+          <article class="guide-step">
+            <div class="step-number">Step 10</div>
+            <div>
+              <h3>Use social and management moves carefully</h3>
+              <div class="guide-cols">
+                <div class="guide-note"><b>What you see</b><p>Connect, Praise, Redirect, and Tell.</p></div>
+                <div class="guide-note"><b>What you study</b><p>Connect draws on a student asset. Praise names useful effort. Redirect protects classroom order. Tell gives the answer directly but may reduce practice.</p></div>
+                <div class="guide-note"><b>What to notice</b><p>Faster is not always better. The strongest move preserves student thinking while supporting the room.</p></div>
+              </div>
+            </div>
+          </article>
+          <article class="guide-step">
+            <div class="step-number">Step 11</div>
+            <div>
+              <h3>Read the result chip</h3>
+              <div class="guide-cols">
+                <div class="guide-note"><b>What you see</b><p>Feedback after your move, including changes to understanding, engagement, rapport, and order.</p></div>
+                <div class="guide-note"><b>What you study</b><p>Cause and effect. Your choice changes the classroom state, and the result chip tells you what moved.</p></div>
+                <div class="guide-note"><b>What to notice</b><p>The classroom is responding to your teaching decision. Use that response to adjust, not to judge yourself.</p></div>
+              </div>
+            </div>
+          </article>
+          <article class="guide-step">
+            <div class="step-number">Step 12</div>
+            <div>
+              <h3>Use the debrief</h3>
+              <div class="guide-cols">
+                <div class="guide-note"><b>What you see</b><p>Pass or miss indicators, missed-objective tips, and reflection choices.</p></div>
+                <div class="guide-note"><b>What you study</b><p>The missed objective. Low wait time means practice pausing. Low participation means reach quiet students. High disruptions mean smaller redirections.</p></div>
+                <div class="guide-note"><b>What to notice</b><p>The debrief turns gameplay into reflection-on-action.</p></div>
+              </div>
+            </div>
+          </article>
+          <article class="guide-step">
+            <div class="step-number">Step 13</div>
+            <div>
+              <h3>Replay with one focus</h3>
+              <div class="guide-cols">
+                <div class="guide-note"><b>What you see</b><p>The option to replay or choose another mission.</p></div>
+                <div class="guide-note"><b>What you study</b><p>One specific focus for the next run, such as wait time, eliciting reasoning, or distributing attention.</p></div>
+                <div class="guide-note"><b>What to notice</b><p>Improvement comes from focused repetition. Try again with a clearer teaching intention.</p></div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="qa">
+      <div class="wrap">
+        <p class="kicker">Beginner QA Revision Pass</p>
+        <h2>Revision summary</h2>
+        <p class="section-copy">The revision pass focused on making the game explain what to do, why an action worked or failed, and what the player should try next.</p>
+        <div class="checks">
+          <div class="check"><b>Onboarding</b><br />Demo-first entry, Hub start marker, and badge explanations.</div>
+          <div class="check"><b>Interaction clarity</b><br />Move hover/focus help, Wait 3s readiness, action-result chips.</div>
+          <div class="check"><b>Feedback loop</b><br />Encounter, Lecture, and Gym feedback, debrief miss tips, and badge card.</div>
+          <div class="check"><b>Custom lessons</b><br />Import preview scenario card, required field validation, play gating.</div>
+          <div class="check"><b>Accessibility</b><br />Settings: audio, large text, reduced motion, dialogue reveal, WASD/Space.</div>
+          <div class="check"><b>Verification</b><br /><span class="pass">PASS</span>: Smoke, Lecture, Gym, Qual, Import, Playtest 12/12.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="package">
+      <div class="wrap">
+        <p class="kicker">Package</p>
+        <h2>Package file structure</h2>
+        <p class="section-copy">The full <code>dist_web</code> folder is the deployable package. It can be uploaded as-is to static hosting such as GitHub Pages, Netlify, or Cloudflare Pages.</p>
+        <div class="files">
+          <div>dist_web/showcase.html  - media showcase + embedded playable</div>
+          <div>dist_web/index.html     - Godot Web playable</div>
+          <div>dist_web/index.wasm     - Godot runtime</div>
+          <div>dist_web/index.pck      - game data package</div>
+          <div>dist_web/videos/chalk-and-chance-showcase.webm - player guide screen recording</div>
+          <div>dist_web/videos/chalk-and-chance-showcase-subtitles.vtt - English subtitle track</div>
+          <div>dist_web/media/*.png    - screenshots used by showcase/reel</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">Generated from the local Chalk & Chance Godot project after the 2026-06-01 beginner QA revision pass.</div>
+  </footer>
+</body>
+</html>
